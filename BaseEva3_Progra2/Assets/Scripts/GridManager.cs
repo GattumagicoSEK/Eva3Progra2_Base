@@ -5,6 +5,7 @@ using UnityEngine;
 public class GridManager : MonoBehaviour
 {
     //El arreglo requiere el mismo orden que el enum
+    public Texture2D map;
     public GameObject[] gridPiecesPrefabs;
     public Vector2Int gridSize;
     public Transform parent;
@@ -52,7 +53,11 @@ public class GridManager : MonoBehaviour
         GameObject pref = gridPiecesPrefabs[(int)pieceType];
 
         GameObject pieceObj = Instantiate(pref, position, Quaternion.identity,parent);
-        
+        //pieceObj.GetComponent<MeshRenderer>().material.color = Color.blue;
+     
+
+
+
         switch (pieceType)
         {
             case GridPieceType.Empty:
@@ -73,10 +78,15 @@ public class GridManager : MonoBehaviour
                 GridPiece_Wall gridPiece_WallDestructible = pieceObj.GetComponent<GridPiece_Wall>();
                 gridPiece_WallDestructible.isWalkable = false;
                 gridPiece_WallDestructible.isEmpty = false;
-                gridPiece_WallDestructible.isDestructible = true;
+                gridPiece_WallDestructible.isDestructible = false;
                 gridPiece_WallDestructible.CreateWall(wallDestructiblePref);
                 piece = gridPiece_WallDestructible;
                 break;
+        }
+
+        if (gridPos.x >= 10)
+        {
+            piece.ChangeColor(Color.blue, true);
         }
 
         return piece;   
@@ -94,12 +104,26 @@ public class GridManager : MonoBehaviour
         {
             gridPieceType = GridPieceType.DestructibleWall;
         }
+        //else if (pos.x == 2 || pos.x == gridSize.x - 3 || pos.y == 2 || pos.y == gridSize.y - 3)
+        //{
+        //    gridPieceType = GridPieceType.FloorPlayer1;
+        //}
         return gridPieceType;
     }
 
     public bool IsPieceWalkable(Vector2Int piecePos)
     {
         return grid[piecePos.x, piecePos.y].isWalkable;
+    }
+
+    public bool IsPieceWalkablePlayer2(Vector2Int piecePos)
+    {
+        return piecePos.x >= 10 && IsPieceWalkable(piecePos);
+    }
+
+    public bool IsPieceWalkablePlayer1(Vector2Int piecePos)
+    {
+        return piecePos.x < 10 && IsPieceWalkable(piecePos);
     }
 
     public GridPiece GetGridPiece(Vector2Int piecePos)
